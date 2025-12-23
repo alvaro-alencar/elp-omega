@@ -1,4 +1,4 @@
-# ELP-Ω: The Entangled Logic Protocol
+# ELP-Ω: Zeckendorf Security Middleware
 
 > **"Pare de bloquear ataques. Comece a gerenciar realidades."**
 
@@ -62,7 +62,7 @@ Utilizando o **Teorema de Zeckendorf**, o protocolo valida a integridade da requ
 
 ## 🚀 Benchmarks e Performance
 
-O ELP-Ω foi desenhado para **High-Frequency Trading** e **Real-Time Systems**. O impacto na latência é desprezível comparado a validações de banco de dados.
+O ELP-Ω foi desenhado para **APIs Críticas** e **Sistemas de Alta Vazão** (High-Throughput). O impacto na latência é desprezível comparado a validações de banco de dados ou WAFs tradicionais.
 
 | Operação | ELP-Ω (Go) | ELP-Ω (Python) | JWT Standard |
 | --- | --- | --- | --- |
@@ -154,6 +154,17 @@ O sistema não rejeita conexões suspeitas; ele as gerencia através de camadas 
 
 **Efeito Tático:** O atacante acredita ter violado o sistema e continua tentando decifrar dados que, ontologicamente, não existem. Isso transforma defesa em ofensa passiva (honeypot dinâmico).
 
+> **Nota de Segurança:** A implementação inclui *Jittering* (atraso aleatório artificial) na geração da Shadow Reality. Isso mitiga ataques de canal lateral (Timing Attacks), tornando o tempo de resposta indistinguível de uma requisição processada na Prime Reality.
+
+## ⚠️ Modelo de Ameaças (Threat Model)
+
+O ELP-Ω atua na Camada de Aplicação (L7). É crucial entender seu escopo:
+
+- Protege contra: Enumeration Attacks, ID Scraping, Replay Attacks e Fuzzing de API.
+
+- Não substitui: Criptografia de transporte (TLS/SSL) nem proteção contra DDoS Volumétrico (L3/L4).
+
+- Requisito Crítico: A segurança depende inteiramente do segredo da SECRET_KEY. Recomendamos rotação periódica via HSM ou Vault.
 ---
 
 ## 📦 Instalação e Testes
@@ -199,11 +210,15 @@ Esta pesquisa propõe que a verdadeira proteção de dados sensíveis deve ser *
 
 ---
 
-## 📄 Licença
+## 📄 Licença e Modelo Comercial
+
+Este projeto opera sob um modelo de Licenciamento Dual (Dual Licensing):
+
+Comunidade & Acadêmico (Open Core): O núcleo de validação matemática (Zeckendorf Constraint) é livre para uso em pesquisas e projetos não-comerciais sob a licença Apache 2.0.
+
+Enterprise (Commercial): O uso em ambientes de produção corporativa requer uma licença comercial da Vortex Development.
 
 © 2025 Álvaro Alencar. Todos os direitos reservados.
-
-Este software é proprietário e desenvolvido como parte de pesquisa acadêmica e industrial.
 
 ---
 
