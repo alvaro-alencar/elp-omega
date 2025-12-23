@@ -1,131 +1,210 @@
 # ELP-Ω: The Entangled Logic Protocol
 
-> **"Ontological Security is not about denying access. It's about controlling the nature of reality presented to the observer."**
+> **"Pare de bloquear ataques. Comece a gerenciar realidades."**
 
 ![Build Status](https://img.shields.io/badge/build-passing-success?style=for-the-badge&logo=github-actions)
 ![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-Proprietary-blue?style=for-the-badge)
-![Author](https://img.shields.io/badge/architect-Álvaro_Alencar-orange?style=for-the-badge)
+![Author](https://img.shields.io/badge/architect-%C3%81lvaro_Alencar-orange?style=for-the-badge)
 
 ---
 
-## 📋 Executive Summary
+## ⚡ Quick Start: Proteja sua API em 5 Minutos
 
-**ELP-Ω (Omega)** is a language-agnostic algorithmic security protocol designed for high-criticality systems. Unlike traditional firewalls operating on binary logic (Allow/Deny), ELP-Ω implements a **Triple-Reality Architecture**, utilizing Zeckendorf's Theorem for constant-time $O(1)$ integrity validation.
+Não reescreva seu código. Adicione o **ELP-Ω Middleware** e ganhe proteção imediata contra Replay Attacks, Scrapers e API Abuse.
 
-This project represents the practical convergence between **Computer Science** (Cryptography and Number Theory) and **Digital Law** (Ontological Security and Information Integrity).
+### Python (FastAPI / Starlette)
+```python
+from fastapi import FastAPI
+from implementations.python.elp_middleware import ElpOmegaMiddleware
+
+app = FastAPI()
+
+# 1. Ative o Campo de Força Lógico
+# Qualquer requisição que viole a Topologia de Zeckendorf receberá uma resposta falsa (Shadow Reality).
+app.add_middleware(ElpOmegaMiddleware, secret_key="SUA_CHAVE_MESTRA_AQUI")
+
+@app.get("/dados-sensiveis")
+def read_data():
+    return {"status": "safe", "data": "Este endpoint está blindado."}
+```
+
+### TypeScript (Express / Node.js)
+```typescript
+import express from 'express';
+import { elpOmegaMiddleware } from './implementations/typescript/elpMiddleware';
+
+const app = express();
+
+// 2. Plug & Play Security
+app.use(elpOmegaMiddleware('SUA_CHAVE_MESTRA_AQUI'));
+
+app.get('/api/financeiro', (req, res) => {
+    res.json({ saldo: 1000000 });
+});
+```
 
 ---
 
-## 📐 Mathematical Foundation: The Zeckendorf Constraint
+## 🛡️ O Que é o ELP-Ω?
 
-The protocol's security foundation rests on **Zeckendorf's Theorem**, which states that any positive integer can be uniquely represented as the sum of non-consecutive Fibonacci numbers.
+**ELP-Ω (Omega)** é um protocolo de segurança algorítmica que substitui firewalls binários (Allow/Deny) por uma **Arquitetura de Tripla Realidade**.
 
-The protocol uses this property to create topologically secure permission masks. Unlike common bitmasks where any bit can be activated, ELP-Ω enforces the **non-adjacency rule**:
+Utilizando o **Teorema de Zeckendorf**, o protocolo valida a integridade da requisição em tempo constante $O(1)$, verificando a adjacência de bits na máscara de permissão.
+
+| Se o atacante... | O Firewall tradicional faz... | O ELP-Ω faz... |
+| --- | --- | --- |
+| **Tenta escalar privilégios** | Bloqueia (403 Forbidden) | **SHADOW Reality:** Retorna "200 OK" com dados falsos gerados matematicamente. |
+| **Tenta um Replay Attack** | Bloqueia ou falha | **SHADOW Reality:** O atacante recebe um hash válido que não descriptografa nada. |
+| **Tem conexão instável** | Falha (Timeout/Error) | **MIRROR Reality:** Entrega dados sanitizados (LGPD safe) para manter a UX. |
+
+---
+
+## 🚀 Benchmarks e Performance
+
+O ELP-Ω foi desenhado para **High-Frequency Trading** e **Real-Time Systems**. O impacto na latência é desprezível comparado a validações de banco de dados.
+
+| Operação | ELP-Ω (Go) | ELP-Ω (Python) | JWT Standard |
+| --- | --- | --- | --- |
+| **Validação Lógica** | **~0.1µs** | ~2.1µs | ~50µs |
+| **Geração de Shadow Payload** | **~3.1µs** | ~30.8µs | N/A (Apenas bloqueia) |
+| **Overhead Total** | **< 5µs** | < 1ms | ~2-10ms |
+
+> *Dados baseados em testes em Intel i7-9750H. Veja o [relatório completo](docs/benchmarks.md).*
+
+---
+
+## 🎯 Casos de Uso Reais
+
+### 1. Setor Bancário (Pix & Open Finance)
+
+* **Desafio:** Atacantes capturam requisições válidas e tentam reenviá-las (Replay Attack) para duplicar transações.
+* **Solução ELP:** A verificação de `Nonce` integrada ao cálculo de Zeckendorf detecta a duplicata em nanossegundos e envia o atacante para a **Shadow Reality**, onde a transação *parece* ter ocorrido, mas nenhum dinheiro é movido.
+
+### 2. Saúde Digital (Prontuários Eletrônicos)
+
+* **Desafio:** Médicos em áreas rurais com 4G instável frequentemente têm requisições corrompidas ou timestamps dessincronizados.
+* **Solução ELP:** Em vez de bloquear o médico (Denial of Service), o sistema ativa a **Mirror Reality**, entregando o prontuário visualizável mas mascarando dados sensíveis (CPF, Endereço), garantindo o atendimento sem violar a LGPD.
+
+### 3. Governo e Defesa (Anti-Scraping)
+
+* **Desafio:** Bots varrem portais de transparência ou APIs públicas buscando vulnerabilidades.
+* **Solução ELP:** Ao detectar padrões de varredura (máscaras de bits sequenciais), o ELP alimenta o bot com dados infinitos e sintéticos, envenenando o banco de dados do atacante (Data Poisoning).
+
+---
+
+## ⚔️ Veja o Ataque em Ação
+
+O repositório inclui um script de demonstração que simula um atacante tentando violar o sistema.
+```bash
+# Execute a simulação
+python demo_attack.py
+```
+
+**Saída Esperada:**
+```text
+[*] ENVIANDO: Máscara 101 (Válida) -> REALIDADE: PRIME (Dados Reais)
+[*] ENVIANDO: Máscara 110 (Violação Zeckendorf) -> REALIDADE: SHADOW (Dados Falsos)
+[!] ENGANO BEM SUCEDIDO: O atacante recebeu um SHADOW_VAULT_ID e acredita ter roubado dados.
+```
+
+---
+
+## 📐 Fundamentação Matemática: O Teorema de Zeckendorf
+
+A segurança do protocolo repousa sobre o **Teorema de Zeckendorf**, que afirma que qualquer número inteiro positivo pode ser representado de forma única como a soma de números de Fibonacci não-consecutivos.
+
+O protocolo usa essa propriedade para criar máscaras de permissão topologicamente seguras. Diferente de bitmasks comuns onde qualquer bit pode ser ativado, o ELP-Ω força a **regra de não-adjacência**:
 
 $$F_n = F_{n-1} + F_{n-2}$$
 
-Mask $M$ validation follows strict boolean logic:
+A validação da máscara $M$ segue uma lógica booleana estrita:
 
-```math
-(M \ \& \ (M \gg 1)) == 0
-```
+$$(M \ \& \ (M \gg 1)) == 0$$
 
-If this operation results in true (0), the mask is topologically valid. Any other value indicates a Privilege Escalation or Bit-Flipping Attack attempt, immediately triggering Shadow Reality countermeasures.
+Se esta operação resulta em verdadeiro (0), a máscara é topologicamente válida. Qualquer outro valor indica uma tentativa de Escalação de Privilégios ou Ataque de Bit-Flipping, acionando imediatamente as contramedidas de Shadow Reality.
 
 ---
 
-## 🔮 Triple-Reality Architecture (Ontological Defense)
+## 🔮 Arquitetura de Tripla Realidade (Defesa Ontológica)
 
-The system doesn't reject suspicious connections; it manages them through reality layers, exhausting attacker resources by trapping them in simulated environments.
+O sistema não rejeita conexões suspeitas; ele as gerencia através de camadas de realidade, esgotando recursos do atacante ao aprisioná-lo em ambientes simulados.
 
-### 1. PRIME REALITY (The Truth)
+### 1. PRIME REALITY (A Verdade)
 
-**Condition:** Valid Zeckendorf Mask + Intact HMAC Signature + Fresh Timestamp + Unique Nonce
+**Condição:** Máscara Zeckendorf Válida + Assinatura HMAC Intacta + Timestamp Fresco + Nonce Único
 
-**Result:** The system delivers real, decrypted, operational data
+**Resultado:** O sistema entrega dados reais, descriptografados e operacionais
 
-**Target:** Legitimate users and authenticated systems
+**Alvo:** Usuários legítimos e sistemas autenticados
 
-### 2. MIRROR REALITY (Graceful Degradation)
+### 2. MIRROR REALITY (Degradação Elegante)
 
-**Condition:** Minor temporal integrity failure (clock drift) or non-malicious formatting errors
+**Condição:** Falha menor de integridade temporal (clock drift) ou erros de formatação não-maliciosos
 
-**Result:** The system delivers sanitized/masked data (e.g., SSN: ***-**-1234)
+**Resultado:** O sistema entrega dados sanitizados/mascarados (ex: CPF: ***-**-1234)
 
-**Purpose:** Maintain usability (UX) on unstable networks without exposing sensitive core
+**Propósito:** Manter a usabilidade (UX) em redes instáveis sem expor o núcleo sensível
 
-### 3. SHADOW REALITY (The Deterministic Labyrinth)
+### 3. SHADOW REALITY (O Labirinto Determinístico)
 
-**Condition:** Zeckendorf Rule violation, HMAC failure, or Replay Attack detection
+**Condição:** Violação da Regra de Zeckendorf, falha no HMAC ou detecção de Replay Attack
 
-**Result:** The system generates, in real-time, a synthetic payload structurally indistinguishable from real data, but with mathematically generated values derived from a "Stability Seed"
+**Resultado:** O sistema gera, em tempo real, um payload sintético estruturalmente indistinguível dos dados reais, mas com valores gerados matematicamente derivados de uma "Semente de Estabilidade"
 
-**Tactical Effect:** The attacker believes they've breached the system and continues attempting to decipher data that, ontologically, doesn't exist. This transforms defense into passive offense (dynamic honeypot).
-
----
-
-## ⚡ Polyglot Implementation (Cross-Platform)
-
-To prove the theorem's universality, the protocol was natively implemented and validated in the 5 major backend languages of today's market. These are not wrappers; they are pure implementations following each ecosystem's paradigms.
-
-| Language | Paradigm | Recommended Application | Status |
-| :--- | :--- | :--- | :--- |
-| **Go** | Concurrent | High-Performance Microservices / Fintech Core | ✅ Stable |
-| **Rust** | System/Safe | Embedded Systems / Blockchain Nodes | ✅ Stable |
-| **Python** | Dynamic | Data Science / AI Pipelines / Prototyping | ✅ Stable |
-| **Kotlin** | Hybrid | JVM Backend / Android Secure Storage | ✅ Stable |
-| **TypeScript** | Event-Driven | Serverless Functions (AWS Lambda) / Node.js | ✅ Stable |
-
-All implementations share unified test vectors, ensuring that a token generated in Python is perfectly validated in Rust.
+**Efeito Tático:** O atacante acredita ter violado o sistema e continua tentando decifrar dados que, ontologicamente, não existem. Isso transforma defesa em ofensa passiva (honeypot dinâmico).
 
 ---
 
-## 🛠️ Engineering and Testing (CI/CD)
+## 📦 Instalação e Testes
 
-The project uses Docker Compose for orchestration of tests in isolated environments. The CI pipeline validates:
-
-- Conformance with Zeckendorf constraint
-- Resistance to Replay Attacks (Nonce management)
-- Deterministic Shadow Vault generation
-
-### Running the Complete Test Suite
-
+O projeto é poliglota. Você pode rodar a suíte de testes completa via Docker:
 ```bash
-# Requires Docker and Docker Compose installed
 docker-compose up --build
 ```
 
-**Expected output:** 5 containers running parallel unit tests and returning exit code 0.
+Isso validará as implementações em **Go, Rust, Python, Kotlin e TypeScript** simultaneamente.
+
+### Implementações Disponíveis
+
+| Linguagem | Paradigma | Aplicação Recomendada | Status |
+| --- | --- | --- | --- |
+| **Go** | Concorrente | Microservices de Alta Performance / Fintech Core | ✅ Estável |
+| **Rust** | Sistema/Seguro | Sistemas Embarcados / Nós Blockchain | ✅ Estável |
+| **Python** | Dinâmica | Data Science / Pipelines de IA / Prototipagem | ✅ Estável |
+| **Kotlin** | Híbrida | Backend JVM / Armazenamento Seguro Android | ✅ Estável |
+| **TypeScript** | Event-Driven | Serverless Functions (AWS Lambda) / Node.js | ✅ Estável |
+
+Todas as implementações compartilham vetores de teste unificados, garantindo que um token gerado em Python seja perfeitamente validado em Rust.
 
 ---
 
-## ⚖️ About the Author and Research
+## ⚖️ Sobre o Autor e a Pesquisa
 
 **Álvaro Alencar**  
-*Lawyer, Software Developer, and Doctoral Researcher*
+*Advogado, Desenvolvedor de Software e Pesquisador*
 
-ELP-Ω was born from the need to bridge the gap between **Legal Security** (required by LGPD/GDPR) and **Technical Security**. While Law demands data protection, Engineering often fails by offering only static barriers.
+O ELP-Ω nasceu da necessidade de preencher a lacuna entre **Segurança Jurídica** (exigida pela LGPD/GDPR) e **Segurança Técnica**. Enquanto o Direito exige proteção de dados, a Engenharia frequentemente falha ao oferecer apenas barreiras estáticas.
 
-This research proposes that true protection of sensitive data must be **Ontological**: the data should not "exist" for unauthorized observers.
-
----
-
-## 📄 License
-
-© 2025 Álvaro Alencar. All rights reserved.
-
-This software is proprietary and developed as part of academic and industrial research.
+Esta pesquisa propõe que a verdadeira proteção de dados sensíveis deve ser **Ontológica**: os dados não devem "existir" para observadores não autorizados.
 
 ---
 
 ## 🔗 Links
 
-- **Documentation:** [Technical Architecture & Operations](docs/architecture.md)
-- **Research Paper:** [Ontological Security: A Philosophical Approach to Cyberdefense](docs/ontological-security.md)
-- **Mathematics:** [The Zeckendorf Constraint Proof](docs/fibonacci-constraint.md)
-- **Contact:** <ac.alvaro@gmail.com>
+* **Documentação:** [Arquitetura Técnica & Operações](docs/architecture.md)
+* **Paper de Pesquisa:** [Segurança Ontológica: Uma Abordagem Filosófica para Ciberdefesa](docs/ontological-security.md)
+* **Matemática:** [Prova da Restrição de Zeckendorf](docs/fibonacci-constraint.md)
+* **Contato:** ac.alvaro@gmail.com
 
 ---
 
-**Built with mathematical rigor. Deployed with strategic intent.**
+## 📄 Licença
+
+© 2025 Álvaro Alencar. Todos os direitos reservados.
+
+Este software é proprietário e desenvolvido como parte de pesquisa acadêmica e industrial.
+
+---
+
+**Construído com rigor matemático. Implantado com intenção estratégica.**
