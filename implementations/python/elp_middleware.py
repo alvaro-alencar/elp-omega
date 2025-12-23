@@ -1,81 +1,84 @@
 import time
-import json
-from fastapi import Request, Response
+import hmac
+import random
+from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
-# Importamos a classe original que você já criou
-from elp_omega import EntangledLogicOmegaV5, Reality
+# Ajuste o import conforme sua estrutura de pastas
+from elp_omega import EntangledLogicOmegaV5
 
 class ElpOmegaMiddleware(BaseHTTPMiddleware):
-    """
-    ELP-Ω Middleware para FastAPI.
-    Intercepta todas as requisições para validar a Realidade Ontológica.
-    
-    Estratégia:
-    1. SHADOW: Retorna 200 OK com dados falsos imediatamente (Short-circuit).
-       Isso protege o backend de processamento inútil (Anti-DoS).
-    2. MIRROR: Marca o request para sanitização posterior ou avisa o backend.
-    3. PRIME: Permite passagem transparente.
-    """
     def __init__(self, app, secret_key: str):
         super().__init__(app)
-        # Inicializa o motor lógico com a chave secreta
         self.security_engine = EntangledLogicOmegaV5(secret=secret_key.encode())
 
     async def dispatch(self, request: Request, call_next):
-        # 1. Extração de Metadados dos Headers
-        # O cliente deve enviar os parâmetros do ELP nos headers HTTP
+        # 1. Extração
         mask = int(request.headers.get("X-ELP-Mask", -1))
         seal = request.headers.get("X-ELP-Seal", "")
         timestamp = int(request.headers.get("X-ELP-Timestamp", 0))
         nonce = request.headers.get("X-ELP-Nonce", "")
-        
-        # O contexto e path são derivados da própria requisição
         path = request.url.path
         context = request.method 
         
-        # Construímos o objeto de análise para o motor
-        req_params = {
-            'mask': mask,
-            'seal': seal,
-            'context': context,
-            'timestamp': timestamp,
-            'path': path,
-            'nonce': nonce
-        }
+        # Variável de decisão
+        is_shadow_candidate = False
 
-        # 2. Pré-Validação (Sem os dados reais ainda)
-        # Usamos uma string vazia como 'real_data' apenas para testar a intenção/permissão
-        # O 'fingerprint' pode ser o IP do cliente
-        client_ip = request.client.host
+        # 2. Validações em Cascata (Fail Fast vs Fail Silent)
         
-        # A lógica aqui é sutil: Validamos a "Forma" (Topology), não o Conteúdo ainda.
-        # Se a máscara for inválida (Bitwise Zeckendorf), já caímos na Shadow Reality.
+        # A. Validação Zeckendorf (Topológica)
         if not self.security_engine.is_valid_zeckendorf_mask(mask):
-            # ESTRATÉGIA DE DEFESA ATIVA:
-            # Retornamos 200 OK (sucesso falso) com payload sintético.
-            # Não chamamos 'call_next(request)', ou seja, o servidor real NÃO trabalha.
-            shadow_payload = self.security_engine.generate_shadow("DUMMY_DATA_FOR_SHADOW", context, path)
-            return JSONResponse(
-                content={"data": shadow_payload, "reality": "SHADOW"},
-                status_code=200 
-            )
+            is_shadow_candidate = True
+        
+        # B. Validação Timestamp (Freshness - 5 min tolerance)
+        now_ms = int(time.time() * 1000)
+        if not is_shadow_candidate:
+             # Tolerância ajustada para 5 minutos (300000ms)
+             if abs(now_ms - timestamp) > 300000: 
+                 is_shadow_candidate = True
 
-        # 3. Execução da Rota Real (Se passou na barreira topológica)
-        start_time = time.time()
+        # C. Validação HMAC (Integridade)
+        if not is_shadow_candidate:
+            expected_seal = self.security_engine.compute_seal(mask, context, timestamp, path, nonce)
+            # compare_digest evita Timing Attacks na comparação de strings
+            if not hmac.compare_digest(seal, expected_seal):
+                is_shadow_candidate = True
+
+        # D. Validação Nonce (Anti-Replay)
+        if not is_shadow_candidate:
+            if nonce in self.security_engine._used_nonces:
+                is_shadow_candidate = True
+            else:
+                # Armazena o nonce (Em produção, use Redis com TTL)
+                self.security_engine._used_nonces[nonce] = now_ms
+
+        # 3. Decisão de Realidade
+        if is_shadow_candidate:
+            return self._serve_shadow_reality(context, path, nonce)
+
+        # 4. Prime Reality (Acesso Concedido)
+        # O processamento real acontece aqui
         response = await call_next(request)
-        process_time = time.time() - start_time
-        
-        # Adiciona header de diagnóstico (opcional, bom para debug)
-        response.headers["X-ELP-Latency"] = str(process_time)
-        
-        # Nota: Para implementação completa do MIRROR (sanitização), 
-        # precisaríamos interceptar o corpo da resposta aqui. 
-        # Por enquanto, focamos na barreira de entrada (PRIME vs SHADOW).
-        
         return response
 
-# --- Como usar este código no seu servidor principal ---
-# from fastapi import FastAPI
-# app = FastAPI()
-# app.add_middleware(ElpOmegaMiddleware, secret_key="SUA_CHAVE_MESTRA_AQUI")
+    def _serve_shadow_reality(self, context, path, nonce):
+        """
+        Entrega a realidade simulada.
+        O objetivo é imitar o tempo de resposta da Prime Reality (que agora tem um sleep de 10-50ms).
+        """
+        # Gera o payload falso mas realista (Bancário)
+        shadow_payload = self.security_engine.generate_shadow("STRUCT", context, path, nonce)
+        
+        # JITTERING ESTRATÉGICO:
+        # A Prime Reality demora entre 10ms e 50ms (simulado no endpoint).
+        # A Shadow Reality deve demorar algo parecido para ser indistinguível.
+        # Vamos configurar para 15ms a 60ms.
+        latency = random.uniform(0.015, 0.060) 
+        time.sleep(latency)
+
+        # Retorna 200 OK.
+        # NÃO incluímos headers reveladores.
+        return JSONResponse(
+            content=shadow_payload,
+            status_code=200
+        )

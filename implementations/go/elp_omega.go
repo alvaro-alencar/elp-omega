@@ -1,139 +1,92 @@
-package elpomega
+package elp_omega
 
 import (
 	"crypto/hmac"
 	"crypto/sha256"
-	"encoding/base64"
+	"encoding/hex"
 	"fmt"
+	"hash/fnv"
+	"math/rand"
 	"sync"
-	"sync/atomic"
 	"time"
 )
 
-// Reality define as camadas de resposta do sistema
-type Reality int
+type Reality string
 
 const (
-	RealityPrime Reality = iota
-	RealityMirror
-	RealityShadow
+	Prime  Reality = "PRIME"
+	Mirror Reality = "MIRROR"
+	Shadow Reality = "SHADOW"
 )
-
-// Constantes de Permissão (Baseadas em Fibonacci)
-const (
-	PermRead   = 1
-	PermWrite  = 2
-	PermExec   = 3
-	PermAdmin  = 5
-	PermSecure = 21
-)
-
-type SecureRequest struct {
-	ZeckendorfMask int
-	Seal           string
-	Context        string
-	Timestamp      int64
-	Path           string
-	Nonce          string
-}
 
 type EntangledLogicOmega struct {
 	secret      []byte
 	maxAgeMs    int64
-	maxFailures int32
-	usedNonces  sync.Map // map[string]int64
-	failures    sync.Map // map[string]*int32
+	usedNonces  map[string]int64
+	mu          sync.Mutex
 }
 
-func NewELP(secret []byte) *EntangledLogicOmega {
-	elp := &EntangledLogicOmega{
-		secret:      secret,
-		maxAgeMs:    300000,
-		maxFailures: 5,
+func New(secret string) *EntangledLogicOmega {
+	return &EntangledLogicOmega{
+		secret:     []byte(secret),
+		maxAgeMs:   300000,
+		usedNonces: make(map[string]int64),
 	}
-	go elp.cleanupNonces()
-	return elp
 }
 
-// isValidZeckendorfMask verifica se não há bits adjacentes (a mágica do protocolo)
-func (e *EntangledLogicOmega) isValidZeckendorfMask(mask int) bool {
-	if mask < 0 {
-		return false
-	}
-	// (mask & (mask >> 1)) == 0 garante que não há bits 1 consecutivos
+func (e *EntangledLogicOmega) IsValidZeckendorfMask(mask uint32) bool {
 	return (mask & (mask >> 1)) == 0
 }
 
-func (e *EntangledLogicOmega) ProcessRequest(req SecureRequest, realData string, fingerprint string) (string, Reality) {
-	// 1. Validação da Máscara (Zeckendorf Constraint)
-	if !e.isValidZeckendorfMask(req.ZeckendorfMask) {
-		// CORREÇÃO 1: Formatação correta para Máscara Inválida
-		return "SHADOW_VAULT_ID:" + e.generateShadow(realData, req.Context, req.Path), RealityShadow
-	}
-
-	// 2. Freshness Check
-	now := time.Now().UnixMilli()
-	if now-req.Timestamp > e.maxAgeMs {
-		return e.sanitize(realData), RealityMirror
-	}
-
-	// 3. HMAC Validation (Seal)
-	expectedSeal := e.computeSeal(req)
-	if req.Seal != expectedSeal {
-		return e.handleFailure(fingerprint, realData)
-	}
-
-	// 4. Anti-Replay (Nonce)
-	if _, loaded := e.usedNonces.LoadOrStore(req.Nonce, now); loaded {
-		// CORREÇÃO 2: Formatação correta para Replay Attack (Aqui estava o erro do teste!)
-		return "SHADOW_VAULT_ID:" + e.generateShadow(realData, req.Context, req.Path), RealityShadow
-	}
-
-	return "PRIME_REALITY: " + realData, RealityPrime
-}
-
-func (e *EntangledLogicOmega) ComputeSeal(req SecureRequest) string {
-	return e.computeSeal(req)
-}
-
-func (e *EntangledLogicOmega) computeSeal(req SecureRequest) string {
+func (e *EntangledLogicOmega) ComputeSeal(mask uint32, context string, timestamp int64, path, nonce string) string {
+	payload := fmt.Sprintf("%d|%s|%d|%s|%s", mask, context, timestamp, path, nonce)
 	h := hmac.New(sha256.New, e.secret)
-	payload := fmt.Sprintf("%d|%s|%d|%s|%s", req.ZeckendorfMask, req.Context, req.Timestamp, req.Path, req.Nonce)
 	h.Write([]byte(payload))
-	return base64.StdEncoding.EncodeToString(h.Sum(nil))
+	return hex.EncodeToString(h.Sum(nil))
 }
 
-func (e *EntangledLogicOmega) handleFailure(fp string, data string) (string, Reality) {
-	val, _ := e.failures.LoadOrStore(fp, new(int32))
-	countPtr := val.(*int32)
-	count := atomic.AddInt32(countPtr, 1)
+// GenerateShadow cria dados bancários falsos baseados em seed determinística
+func (e *EntangledLogicOmega) GenerateShadow(context, path, nonce string) map[string]interface{} {
+	// Cria seed determinística
+	seedStr := fmt.Sprintf("%s|%s|%s", path, context, nonce)
+	h := fnv.New64a()
+	h.Write([]byte(seedStr))
+	seed := h.Sum64()
 
-	if count > e.maxFailures {
-		return "SHADOW_VAULT_ID:" + e.generateShadow(data, "atk", "trap") + ":ENCRYPTED", RealityShadow
+	r := rand.New(rand.NewSource(int64(seed)))
+
+	// Dados sintéticos
+	balance := 1000.0 + r.Float64()*(500000.0-1000.0)
+	accType := "checking"
+	if r.Float64() > 0.5 {
+		accType = "savings"
 	}
-	return e.sanitize(data), RealityMirror
-}
 
-func (e *EntangledLogicOmega) sanitize(data string) string {
-	return "[MASKED DATA] - Reality Mirror"
-}
-
-func (e *EntangledLogicOmega) generateShadow(realData, ctx, path string) string {
-	h := hmac.New(sha256.New, e.secret)
-	seed := fmt.Sprintf("SHADOW|%s|%s|%d", path, ctx, len(realData))
-	h.Write([]byte(seed))
-	return base64.RawURLEncoding.EncodeToString(h.Sum(nil)[:8])
-}
-
-func (e *EntangledLogicOmega) cleanupNonces() {
-	ticker := time.NewTicker(1 * time.Hour)
-	for range ticker.C {
-		now := time.Now().UnixMilli()
-		e.usedNonces.Range(func(key, value interface{}) bool {
-			if now-(value.(int64)) > 3600000 {
-				e.usedNonces.Delete(key)
-			}
-			return true
-		})
+	return map[string]interface{}{
+		"status":         "success",
+		"transaction_id": fmt.Sprintf("tx-%d", r.Int63()), // Simplificado
+		"timestamp":      time.Now().UnixMilli(),
+		"data": map[string]interface{}{
+			"account_type": accType,
+			"balance":      balance,
+			"currency":     "BRL",
+			"flags":        []string{"verified", "secure"},
+		},
+		"meta": map[string]interface{}{
+			"processing_time_ms": r.Intn(140) + 10,
+			"region":             "sa-east-1",
+		},
 	}
+}
+
+// CheckReplay verifica nonces
+func (e *EntangledLogicOmega) CheckReplay(nonce string) bool {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	
+	if _, exists := e.usedNonces[nonce]; exists {
+		return true // É Replay
+	}
+	e.usedNonces[nonce] = time.Now().UnixMilli()
+	return false
 }

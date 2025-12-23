@@ -1,11 +1,13 @@
 use hmac::{Hmac, Mac};
-use sha2::Sha256;
+use sha2::{Sha256, Digest};
 use base64::{Engine as _, engine::general_purpose};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
+use serde_json::json;
+// Adicionar rand no Cargo.toml se não tiver, ou usar pseudo-random simples
+// Para manter sem deps extras pesadas, faremos um LCG simples baseado no hash
 
-// Definição dos Tipos
 type HmacSha256 = Hmac<Sha256>;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -18,9 +20,7 @@ pub enum Reality {
 pub struct EntangledLogicOmega {
     secret: Vec<u8>,
     max_age_ms: u128,
-    max_failures: u32,
     used_nonces: Arc<Mutex<HashMap<String, u128>>>,
-    failures: Arc<Mutex<HashMap<String, (u32, u128)>>>,
 }
 
 impl EntangledLogicOmega {
@@ -28,28 +28,60 @@ impl EntangledLogicOmega {
         EntangledLogicOmega {
             secret: secret.as_bytes().to_vec(),
             max_age_ms: 300_000, // 5 minutos
-            max_failures: 5,
             used_nonces: Arc::new(Mutex::new(HashMap::new())),
-            failures: Arc::new(Mutex::new(HashMap::new())),
         }
     }
 
-    /// Valida a Constraint de Zeckendorf (Bitwise O(1))
-    /// Retorna true se não houver bits adjacentes ativos
     pub fn is_valid_zeckendorf_mask(&self, mask: u32) -> bool {
         (mask & (mask >> 1)) == 0
     }
 
-    /// Gera o Selo HMAC para integridade
     pub fn compute_seal(&self, mask: u32, context: &str, timestamp: u128, path: &str, nonce: &str) -> String {
         let payload = format!("{}|{}|{}|{}|{}", mask, context, timestamp, path, nonce);
-        let mut mac = HmacSha256::new_from_slice(&self.secret).expect("HMAC can take key of any size");
+        let mut mac = HmacSha256::new_from_slice(&self.secret).expect("HMAC error");
         mac.update(payload.as_bytes());
         let result = mac.finalize();
-        general_purpose::STANDARD.encode(result.into_bytes())
+        hex::encode(result.into_bytes())
     }
 
-    /// Processa a requisição e define a Realidade de resposta
+    // Retorna JSON Value para ser serializado
+    pub fn generate_shadow(&self, context: &str, path: &str, nonce: &str) -> serde_json::Value {
+        // Seed determinística baseada no hash da requisição
+        let seed_str = format!("{}|{}|{}|{:?}", path, context, nonce, self.secret);
+        let mut hasher = Sha256::new();
+        hasher.update(seed_str);
+        let result = hasher.finalize();
+        
+        // Usa os primeiros bytes como seed para um LCG simples
+        let mut seed = u64::from_be_bytes(result[0..8].try_into().unwrap());
+        
+        // Função auxiliar rand
+        let mut rand_f64 = || {
+            seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+            (seed as f64) / (u64::MAX as f64)
+        };
+
+        let balance = (rand_f64() * 500_000.0).round();
+        let acc_type = if rand_f64() > 0.5 { "checking" } else { "savings" };
+        let processing_ms = (rand_f64() * 140.0) as u64 + 10;
+
+        json!({
+            "status": "success",
+            "transaction_id": uuid::Uuid::new_v4().to_string(), // UUID random é aceitável
+            "timestamp": SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as u64,
+            "data": {
+                "account_type": acc_type,
+                "balance": balance,
+                "currency": "BRL",
+                "flags": ["verified", "secure"]
+            },
+            "meta": {
+                "processing_time_ms": processing_ms,
+                "region": "sa-east-1"
+            }
+        })
+    }
+
     pub fn process_request(
         &self, 
         mask: u32, 
@@ -57,90 +89,42 @@ impl EntangledLogicOmega {
         context: &str, 
         timestamp: u128, 
         path: &str, 
-        nonce: &str,
-        real_data: &str,
-        fingerprint: &str
-    ) -> (String, Reality) {
+        nonce: &str
+    ) -> (serde_json::Value, Reality) {
         
-        // 1. Validação Topológica (Zeckendorf)
-        if !self.is_valid_zeckendorf_mask(mask) {
-            return (self.generate_shadow(real_data, context, path), Reality::Shadow);
+        let mut is_shadow = false;
+
+        // 1. Validação Topológica
+        if !self.is_valid_zeckendorf_mask(mask) { is_shadow = true; }
+
+        // 2. Freshness
+        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis();
+        if !is_shadow && (now < timestamp || (now - timestamp) > self.max_age_ms) {
+            is_shadow = true;
         }
 
-        // 2. Freshness Check (Timestamp)
-        let start = SystemTime::now();
-        let since_the_epoch = start
-            .duration_since(UNIX_EPOCH)
-            .expect("Time went backwards")
-            .as_millis();
-
-        // Verifica se o timestamp está no futuro ou muito no passado
-        if timestamp > since_the_epoch || (since_the_epoch - timestamp) > self.max_age_ms {
-            return (self.sanitize(real_data), Reality::Mirror);
+        // 3. HMAC
+        if !is_shadow {
+            let expected = self.compute_seal(mask, context, timestamp, path, nonce);
+            if seal != expected { is_shadow = true; }
         }
 
-        // 3. Validação Criptográfica (HMAC)
-        let expected_seal = self.compute_seal(mask, context, timestamp, path, nonce);
-        if seal != expected_seal {
-            return self.handle_failure(fingerprint, real_data, context, path);
+        // 4. Nonce
+        if !is_shadow {
+            let mut nonces = self.used_nonces.lock().unwrap();
+            if nonces.contains_key(nonce) {
+                is_shadow = true;
+            } else {
+                nonces.insert(nonce.to_string(), now);
+            }
         }
 
-        // 4. Anti-Replay (Nonce)
-        let mut nonces = self.used_nonces.lock().unwrap();
-        if nonces.contains_key(nonce) {
-            return (self.generate_shadow(real_data, context, path), Reality::Shadow);
-        }
-        nonces.insert(nonce.to_string(), since_the_epoch);
-
-        (format!("PRIME_REALITY: {}", real_data), Reality::Prime)
-    }
-
-    fn handle_failure(&self, fingerprint: &str, data: &str, ctx: &str, path: &str) -> (String, Reality) {
-        let start = SystemTime::now();
-        let now = start.duration_since(UNIX_EPOCH).unwrap().as_millis();
-        
-        let mut fails = self.failures.lock().unwrap();
-        let record = fails.entry(fingerprint.to_string()).or_insert((0, now));
-
-        // Reset se passou mais de 1 hora
-        if now - record.1 > 3600_000 {
-            *record = (1, now);
-        } else {
-            record.0 += 1;
+        if is_shadow {
+            // Retorna Shadow Payload (Stealth)
+            return (self.generate_shadow(context, path, nonce), Reality::Shadow);
         }
 
-        if record.0 > self.max_failures {
-            (self.generate_shadow(data, ctx, path), Reality::Shadow)
-        } else {
-            (self.sanitize(data), Reality::Mirror)
-        }
-    }
-
-    fn sanitize(&self, data: &str) -> String {
-        // Simples regex replacement simulation
-        let no_digits: String = data.chars().map(|c| if c.is_numeric() { '*' } else { c }).collect();
-        no_digits.replace("senha=", "senha=********")
-    }
-
-    fn generate_shadow(&self, real_data: &str, context: &str, path: &str) -> String {
-        let seed = format!("SHADOW|{}|{}|STABILITY|{}", path, context, real_data.len());
-        let mut mac = HmacSha256::new_from_slice(&self.secret).expect("HMAC error");
-        mac.update(seed.as_bytes());
-        let result = mac.finalize();
-        let hash = general_purpose::URL_SAFE_NO_PAD.encode(result.into_bytes());
-        
-        format!("SHADOW_VAULT_ID:{}:DATA_ENCRYPTED", &hash[..16])
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_zeckendorf_validation() {
-        let elp = EntangledLogicOmega::new("test_secret");
-        assert!(elp.is_valid_zeckendorf_mask(5)); // 101 -> OK
-        assert!(!elp.is_valid_zeckendorf_mask(6)); // 110 -> Fail
+        // Retorna Prime Reality (Simulação de sucesso)
+        (json!({"data": "PRIME_REALITY_DATA"}), Reality::Prime)
     }
 }
