@@ -121,9 +121,10 @@ This software is proprietary and developed as part of academic and industrial re
 
 ## 🔗 Links
 
-- **Documentation:** [Coming Soon]
-- **Research Paper:** [Coming Soon]
-- **Contact:** [Your Contact Information]
+- **Documentation:** [Technical Architecture & Operations](docs/architecture.md)
+- **Research Paper:** [Ontological Security: A Philosophical Approach to Cyberdefense](docs/ontological-security.md)
+- **Mathematics:** [The Zeckendorf Constraint Proof](docs/fibonacci-constraint.md)
+- **Contact:** ac.alvaro@gmail.com
 
 ---
 
