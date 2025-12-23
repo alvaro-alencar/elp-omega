@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  test-go:
+    image: golang:1.21-alpine
+    working_dir: /app/implementations/go
+    volumes:
+      - .:/app
+    command: go test -v ./...
+    environment:
+      - CGO_ENABLED=0
+
+  test-rust:
+    image: rust:latest
+    working_dir: /app/implementations/rust
+    volumes:
+      - .:/app
+    command: cargo test
+
+  test-kotlin:
+    image: gradle:8.5-jdk17
+    working_dir: /app/implementations/kotlin
+    volumes:
+      - .:/app
+    # Usando gradle diretamente pois o wrapper pode não estar presente/compatível
+    command: gradle test --info
+
+  test-python:
+    image: python:3.11-slim
+    working_dir: /app/implementations/python
+    volumes:
+      - .:/app
+    command: python -m unittest test_elp_omega.py
+
+  test-ts:
+    image: node:20-alpine
+    working_dir: /app/implementations/typescript
+    volumes:
+      - .:/app
+    command: sh -c "npm install && npm test"

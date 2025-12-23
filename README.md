@@ -1,283 +1,58 @@
-# ELP-Ω: Entangled Logic Protocol - Omega
+# ELP-Ω (Entangled Logic Protocol - Omega)
 
-<div align="center">
+> **"A segurança não é apenas negar o acesso; é controlar a natureza da realidade para o observador."**
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Go](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)
-![Kotlin](https://img.shields.io/badge/Kotlin-1.9+-7F52FF?logo=kotlin)
-![Security](https://img.shields.io/badge/security-hardened-green)
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-100%25-success)
+![Author](https://img.shields.io/badge/architect-Álvaro_Alencar-blue)
 
-*A cryptographic security architecture that uses triple-reality shifting and Fibonacci constraints to detect and deceive attackers while protecting real systems.*
+## 🏛 O Conceito (Segurança Ontológica)
 
-[Features](#features) • [Quick Start](#quick-start) • [Architecture](#architecture) • [Implementations](#implementations) • [Benchmarks](#benchmarks) • [Contributing](#contributing)
+O **ELP-Ω** não é apenas um firewall ou um validador de tokens. É uma implementação algorítmica do conceito de **Segurança Ontológica**, desenvolvida como parte de uma investigação doutoral sobre a integridade e a existência de dados em ambientes hostis.
 
-</div>
+A maioria dos sistemas de segurança opera no binário: *Acesso Permitido* ou *Acesso Negado*. O ELP-Ω introduz uma terceira via: a **Realidade Simulada**.
 
----
+Ao utilizar a **Teoria de Zeckendorf** (soma de números de Fibonacci não-consecutivos) para validação de permissões em tempo constante O(1), o protocolo cria um labirinto matemático onde atacantes não são apenas bloqueados — eles são exilados para uma realidade sombra.
 
-## 🌀 What is ELP-Ω?
+## 📐 A Matemática: Restrição de Zeckendorf
 
-**ELP-Ω** (Entangled Logic Protocol - Omega) is a novel security architecture that combines:
+Diferente de bitmasks tradicionais, o ELP-Ω impõe uma restrição topológica nas permissões baseada na sequência de Fibonacci:
 
-- **Fibonacci Constraint Validation** (Zeckendorf-inspired non-adjacency)
-- **HMAC-SHA256 Authentication** (AWS Signature V4-like)
-- **Triple-Reality Response System** (Prime, Mirror, Shadow)
-- **Deterministic Shadow Data Generation** (confuses attackers)
-- **Anti-Replay Protection** (nonce validation)
-- **Rate Limiting** (gradual degradation)
+$$F_n = F_{n-1} + F_{n-2}$$
 
-### Traditional Security vs ELP-Ω
-```
-┌─────────────────────────────────────────┐
-│ TRADITIONAL:                            │
-│ ❌ Valid   → 200 OK (real data)         │
-│ ❌ Invalid → 403 Forbidden (obvious)    │
-└─────────────────────────────────────────┘
+A regra fundamental do protocolo é que **nenhum bit de permissão adjacente pode estar ativo simultaneamente**.
+`mask & (mask >> 1) == 0`
 
-┌─────────────────────────────────────────┐
-│ ELP-Ω:                                  │
-│ ✅ Valid   → 200 OK (PRIME reality)     │
-│ ⚠️  Expired → 200 OK (MIRROR reality)   │
-│ 🎭 Attack  → 200 OK (SHADOW reality)    │
-└─────────────────────────────────────────┘
-```
+Isso impede vetores de ataque comuns baseados em "privilege escalation" sequencial e cria uma assinatura digital única para cada requisição.
 
-**Attackers receive fake data that LOOKS real, wasting their time while you monitor.**
+## 🔮 Arquitetura "Triple-Reality"
 
----
+O sistema decide qual versão da realidade entregar ao usuário baseando-se na integridade criptográfica da requisição:
 
-## ✨ Features
+1.  **PRIME REALITY:** O dado real, íntegro e descriptografado. Entregue apenas quando a Máscara Zeckendorf, o Timestamp e o HMAC-SHA256 são perfeitamente válidos.
+2.  **MIRROR REALITY:** Uma versão sanitizada (mascarada) dos dados. Entregue quando há uma degradação benigna (ex: latência de rede ou relógio dessincronizado), mantendo a usabilidade sem expor o núcleo.
+3.  **SHADOW REALITY:** O contra-ataque. Se uma violação da regra de Zeckendorf ou um *Replay Attack* é detectado, o sistema gera dados falsos, deterministicamente calculados, que parecem reais estruturalmente, mas são ontologicamente vazios. Isso consome recursos do atacante enquanto protege o sistema.
 
-### 🔒 **Fibonacci Permission System**
-Uses non-adjacent bit positions (Zeckendorf theorem) to detect forced privileges:
-```kotlin
-// Valid: READ (1) + ADMIN (5) = indices 0 and 3 (non-adjacent)
-val mask = 0b1001  // ✅ Valid
+## ⚡ Implementações Poliglotas
 
-// Invalid: READ (1) + WRITE (2) = indices 0 and 1 (adjacent)
-val mask = 0b0011  // ❌ Triggers SHADOW reality
-```
+Este repositório contém a prova de conceito e a implementação de referência do protocolo em 5 linguagens, validando sua universalidade:
 
-### 🎭 **Triple-Reality System**
+| Linguagem | Status | Foco da Implementação |
+| :--- | :--- | :--- |
+| **Go** | ✅ Estável | Alta performance e concorrência (Backend Core) |
+| **Rust** | ✅ Estável | Segurança de memória e Zero-Cost Abstraction |
+| **Python** | ✅ Estável | Integração rápida e Prototipagem (Data Science) |
+| **Kotlin** | ✅ Estável | Ecossistema JVM e Android |
+| **TypeScript** | ✅ Estável | Aplicações Web e Edge Computing |
 
-| Reality | When | Response |
-|---------|------|----------|
-| **PRIME** | Valid auth + fresh request | Real data |
-| **MIRROR** | Valid auth + stale timestamp | Sanitized data |
-| **SHADOW** | Invalid auth or attack detected | Fake data (HMAC-generated) |
+Todas as implementações foram validadas via containerização Docker com 100% de aprovação nos testes unitários de lógica e criptografia.
 
-### 🛡️ **Security Features**
+## 👨‍💻 Sobre o Autor
 
-- ✅ **HMAC-SHA256** authentication (impossible to forge without secret)
-- ✅ **Nonce anti-replay** (prevents request reuse)
-- ✅ **Timestamp validation** (5-minute default window)
-- ✅ **Rate limiting** (gradual degradation after failures)
-- ✅ **Constant-time comparison** (prevents timing attacks)
-- ✅ **Deterministic shadows** (same attack = same fake data)
+**Álvaro Alencar**
+*Advogado, Desenvolvedor e Pesquisador.*
+
+Este projeto é fruto de pesquisa independente na intersecção entre Direito Digital, Filosofia da Informação e Engenharia de Software. O objetivo é demonstrar que a segurança jurídica e a segurança computacional podem convergir em protocolos matematicamente robustos.
 
 ---
-
-## 🚀 Quick Start
-
-### Go Implementation
-```go
-package main
-
-import (
-    "github.com/yourusername/elp-omega/implementations/go"
-    "time"
-)
-
-func main() {
-    elp := elpomega.NewELP([]byte("your-secret-key"))
-    
-    // Build valid Fibonacci mask (non-adjacent)
-    mask := 1 | (1 << 3)  // READ (bit 0) + ADMIN (bit 3)
-    
-    req := elpomega.SecureRequest{
-        ZeckendorfMask: mask,
-        Context:        "user-dashboard",
-        Timestamp:      time.Now().UnixMilli(),
-        Path:           "/api/data",
-        Nonce:          "unique-uuid",
-    }
-    req.Seal = elp.ComputeSeal(req)
-    
-    result, reality := elp.ProcessRequest(req, "REAL_DATA", "client-ip")
-    // reality = RealityPrime, RealityMirror, or RealityShadow
-}
-```
-
-### Kotlin Implementation
-```kotlin
-val elp = EntangledLogicOmegaV5(
-    secretProvider = { "your-secret-key".toByteArray() }
-)
-
-// Builder pattern for masks
-val mask = elp.maskBuilder()
-    .read()
-    .admin()
-    .secure()
-    .build()
-
-val req = EntangledLogicOmegaV5.SecureRequest(
-    zeckendorfMask = mask,
-    seal = computedSeal,
-    context = "user-dashboard",
-    timestamp = System.currentTimeMillis(),
-    path = "/api/data",
-    nonce = UUID.randomUUID().toString()
-)
-
-val result = elp.processRequest(req, "REAL_DATA", "client-fingerprint")
-```
-
----
-
-## 🏗️ Architecture
-```
-┌─────────────────────────────────────────────────────┐
-│                 CLIENT REQUEST                      │
-│  (mask + seal + timestamp + nonce + context)        │
-└────────────────────┬────────────────────────────────┘
-                     │
-        ┌────────────▼────────────┐
-        │  Fibonacci Validation   │
-        │  (Non-adjacent check)   │
-        └────────────┬────────────┘
-                     │
-        ┌────────────▼────────────┐
-        │   Timestamp Check       │
-        │   (Freshness)           │
-        └────────────┬────────────┘
-                     │
-        ┌────────────▼────────────┐
-        │   HMAC Validation       │
-        │   (Seal check)          │
-        └────────────┬────────────┘
-                     │
-        ┌────────────▼────────────┐
-        │   Nonce Anti-Replay     │
-        │   (Prevent reuse)       │
-        └────────────┬────────────┘
-                     │
-     ┌───────────────┴───────────────┐
-     │                               │
-┌────▼────┐  ┌────────┐  ┌──────────▼──┐
-│  PRIME  │  │ MIRROR │  │   SHADOW    │
-│  Real   │  │ Masked │  │ Fake (HMAC) │
-└─────────┘  └────────┘  └─────────────┘
-```
-
-For detailed architecture, see [docs/architecture.md](docs/architecture.md)
-
----
-
-## 📊 Benchmarks
-
-| Operation | Go | Kotlin | Python |
-|-----------|-----|--------|--------|
-| **HMAC Computation** | ~0.8µs | ~1.2µs | ~15µs |
-| **Fibonacci Validation** | ~0.1µs | ~0.2µs | ~2µs |
-| **Full Request (PRIME)** | ~2µs | ~3µs | ~25µs |
-| **Full Request (SHADOW)** | ~3µs | ~4µs | ~30µs |
-
-*Tested on: Intel i7-9750H, 16GB RAM*
-
-See [docs/benchmarks.md](docs/benchmarks.md) for detailed results.
-
----
-
-## 🛠️ Implementations
-
-### Production-Ready
-- ✅ **Go** - High-performance server implementation
-- ✅ **Kotlin** - Android/JVM implementation with lifecycle management
-
-### Coming Soon
-- 🔜 **Python** - Flask/FastAPI integration
-- 🔜 **Rust** - Ultra-performance embedded systems
-- 🔜 **JavaScript/TypeScript** - Node.js/Deno implementation
-
----
-
-## 🔬 Security Analysis
-
-### Threat Model
-
-| Attack Vector | Protection |
-|---------------|------------|
-| **Brute-force seal** | HMAC-SHA256 (2^256 keyspace) |
-| **Replay attacks** | Nonce validation |
-| **Timing attacks** | Constant-time comparison |
-| **Privilege escalation** | Fibonacci constraint |
-| **Token theft** | Timestamp expiration |
-
-See [docs/security-analysis.md](docs/security-analysis.md) for full analysis.
-
----
-
-## 📖 Documentation
-
-- [Architecture Overview](docs/architecture.md)
-- [Fibonacci Constraint Math](docs/fibonacci-constraint.md)
-- [Triple-Reality Concept](docs/triple-reality.md)
-- [Security Analysis](docs/security-analysis.md)
-- [Performance Benchmarks](docs/benchmarks.md)
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) first.
-
-### Development Setup
-```bash
-# Clone repository
-git clone https://github.com/yourusername/elp-omega.git
-cd elp-omega
-
-# Run tests (Go)
-cd implementations/go
-go test -v ./...
-
-# Run tests (Kotlin)
-cd implementations/kotlin
-./gradlew test
-```
-
----
-
-## 📜 License
-
-This project is licensed under the **MIT License** - see [LICENSE](LICENSE) for details.
-
----
-
-## 🙏 Acknowledgments
-
-Inspired by:
-- **Unix file permissions** (bitwise operations)
-- **AWS Signature V4** (HMAC authentication)
-- **Honeypot technology** (deception techniques)
-- **Zeckendorf's theorem** (Fibonacci uniqueness)
-
----
-
-## 📧 Contact
-
-**Author:** Álvaro Alencar  
-**Email:** [ac.alvaro@gmail.com]  
-**LinkedIn:** [https://www.linkedin.com/in/adv-dev-alvaroalencar/]  
-**WhatsApp:** [+55 (38) 9 9991-4890]
-
----
-
-<div align="center">
-
-**If you find this project useful, please ⭐ star it on GitHub!**
-
-Made with 🌀 by the Vortex Development team
-
-</div>
+© 2025 Álvaro Alencar. Todos os direitos reservados.

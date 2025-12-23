@@ -109,3 +109,96 @@ impl EntangledLogicOmega {
         format!("SHADOW_VAULT_ID:{}:ENCRYPTED", hash)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::thread;
+    use std::time::Duration;
+
+    #[test]
+    fn test_zeckendorf_validation() {
+        let elp = EntangledLogicOmega::new(b"secret".to_vec(), 300000, 5);
+        
+        // 1001 (9) -> Valid (non-adjacent)
+        assert!(elp.is_valid_zeckendorf_mask(0b1001));
+        
+        // 10100 (20) -> Valid
+        assert!(elp.is_valid_zeckendorf_mask(0b10100));
+        
+        // 11 (3) -> Invalid (adjacent)
+        assert!(!elp.is_valid_zeckendorf_mask(0b11));
+        
+        // 110 (6) -> Invalid
+        assert!(!elp.is_valid_zeckendorf_mask(0b110));
+    }
+
+    #[test]
+    fn test_prime_reality_flow() {
+        let elp = EntangledLogicOmega::new(b"secret".to_vec(), 300000, 5);
+        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as u64;
+        
+        let mut req = SecureRequest {
+            mask: 0b1001,
+            seal: String::new(),
+            context: "test".to_string(),
+            timestamp: now,
+            path: "/api/test".to_string(),
+            nonce: "nonce1".to_string(),
+        };
+        req.seal = elp.compute_seal(&req);
+
+        let (res, reality) = elp.process_request(req, "REAL_DATA", "fp1");
+        assert_eq!(reality, Reality::Prime);
+        assert!(res.contains("PRIME_REALITY"));
+    }
+
+    #[test]
+    fn test_shadow_reality_on_invalid_mask() {
+        let elp = EntangledLogicOmega::new(b"secret".to_vec(), 300000, 5);
+        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as u64;
+
+        let req = SecureRequest {
+            mask: 0b11, // Invalid
+            seal: "ignored".to_string(),
+            context: "test".to_string(),
+            timestamp: now,
+            path: "/api/test".to_string(),
+            nonce: "nonce2".to_string(),
+        };
+
+        let (_, reality) = elp.process_request(req, "REAL_DATA", "fp1");
+        assert_eq!(reality, Reality::Shadow);
+    }
+
+    #[test]
+    fn test_replay_protection() {
+        let elp = EntangledLogicOmega::new(b"secret".to_vec(), 300000, 5);
+        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as u64;
+
+        let mut req = SecureRequest {
+            mask: 0b1001,
+            seal: String::new(),
+            context: "test".to_string(),
+            timestamp: now,
+            path: "/api/test".to_string(),
+            nonce: "replay_nonce".to_string(),
+        };
+        req.seal = elp.compute_seal(&req);
+
+        // First call
+        let (_, reality1) = elp.process_request(SecureRequest { 
+            seal: req.seal.clone(), 
+            context: req.context.clone(),
+            nonce: req.nonce.clone(),
+            path: req.path.clone(),
+            timestamp: req.timestamp,
+            mask: req.mask
+        }, "DATA", "fp1");
+        assert_eq!(reality1, Reality::Prime);
+
+        // Second call (Replay)
+        let (_, reality2) = elp.process_request(req, "DATA", "fp1");
+        assert_eq!(reality2, Reality::Shadow);
+    }
+}

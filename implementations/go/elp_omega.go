@@ -1,7 +1,7 @@
-package main
+package elpomega
 
 import (
-	"crypto/hmr"
+	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
@@ -67,7 +67,8 @@ func (e *EntangledLogicOmega) isValidZeckendorfMask(mask int) bool {
 func (e *EntangledLogicOmega) ProcessRequest(req SecureRequest, realData string, fingerprint string) (string, Reality) {
 	// 1. Validação da Máscara (Zeckendorf Constraint)
 	if !e.isValidZeckendorfMask(req.ZeckendorfMask) {
-		return e.generateShadow(realData, req.Context, req.Path), RealityShadow
+		// CORREÇÃO 1: Formatação correta para Máscara Inválida
+		return "SHADOW_VAULT_ID:" + e.generateShadow(realData, req.Context, req.Path), RealityShadow
 	}
 
 	// 2. Freshness Check
@@ -84,10 +85,15 @@ func (e *EntangledLogicOmega) ProcessRequest(req SecureRequest, realData string,
 
 	// 4. Anti-Replay (Nonce)
 	if _, loaded := e.usedNonces.LoadOrStore(req.Nonce, now); loaded {
-		return e.generateShadow(realData, req.Context, req.Path), RealityShadow
+		// CORREÇÃO 2: Formatação correta para Replay Attack (Aqui estava o erro do teste!)
+		return "SHADOW_VAULT_ID:" + e.generateShadow(realData, req.Context, req.Path), RealityShadow
 	}
 
 	return "PRIME_REALITY: " + realData, RealityPrime
+}
+
+func (e *EntangledLogicOmega) ComputeSeal(req SecureRequest) string {
+	return e.computeSeal(req)
 }
 
 func (e *EntangledLogicOmega) computeSeal(req SecureRequest) string {
@@ -130,24 +136,4 @@ func (e *EntangledLogicOmega) cleanupNonces() {
 			return true
 		})
 	}
-}
-
-func main() {
-	elp := NewELP([]byte("secret-key"))
-	
-	// Exemplo de máscara válida: PermRead(1) e PermAdmin(5) 
-	// Bits: 1 (idx 0) e 5 (idx 3). Binário: 1001 (Sem vizinhos)
-	mask := 1 | (1 << 3) 
-	
-	req := SecureRequest{
-		ZeckendorfMask: mask,
-		Context:        "dashboard",
-		Timestamp:      time.Now().UnixMilli(),
-		Path:           "/api/data",
-		Nonce:          "unique-uuid-1",
-	}
-	req.Seal = elp.computeSeal(req)
-
-	res, reality := elp.ProcessRequest(req, "SENHA123", "ip-127-0-0-1")
-	fmt.Printf("Reality: %v | Result: %s\n", reality, res)
 }
