@@ -120,7 +120,7 @@ Update relevant docs:
 
 ## Questions?
 
-Open a discussion or reach out: **opensource@vortex.dev**
+Open a discussion or reach out: **ac.alvaro@gmail.com**
 
 ---
 

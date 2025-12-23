@@ -1,0 +1,8 @@
+stateDiagram-v2
+    [*] --> Validation
+    Validation --> PRIME: 100% Valid
+    Validation --> MIRROR: Stale/Minor Fail
+    Validation --> SHADOW: Attack/Policy Breach
+    PRIME --> [*]: Real Data
+    MIRROR --> [*]: Masked Data
+    SHADOW --> [*]: Fake Deterministic Data

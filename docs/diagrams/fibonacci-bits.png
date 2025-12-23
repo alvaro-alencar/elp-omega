@@ -1,0 +1,11 @@
+gantt
+    title Mapeamento de Bits de Permissão (Zeckendorf)
+    dateFormat  YYYY-MM-DD
+    section Bits
+    Bit 0 (Fib 1 - READ)     :active, p1, 2024-01-01, 1d
+    Bit 1 (Fib 2 - WRITE)    :p2, 2024-01-01, 1d
+    Bit 2 (Fib 3 - EXEC)     :active, p3, 2024-01-01, 1d
+    Bit 3 (Fib 5 - ADMIN)    :p4, 2024-01-01, 1d
+    Bit 4 (Fib 8 - AUDIT)    :active, p5, 2024-01-01, 1d
+    note over Bit 0, Bit 1 : VIOLAÇÃO (Adjacentes)
+    note over Bit 0, Bit 2 : VÁLIDO (Não-Adjacentes)
