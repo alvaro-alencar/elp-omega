@@ -1,0 +1,4 @@
+# Dependências Core (Nativas no Python 3.11+, mas listadas para clareza)
+# Nenhuma dependência externa pesada é necessária para o Core do ELP-Omega.
+# Para rodar os testes unitários:
+unittest-xml-reporting==3.2.0
