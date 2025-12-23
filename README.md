@@ -1,58 +1,201 @@
-# ELP-Ω (Entangled Logic Protocol - Omega)
+# ELP-Ω: The Entangled Logic Protocol
 
-> **"A segurança não é apenas negar o acesso; é controlar a natureza da realidade para o observador."**
+> **"Segurança Ontológica não é sobre negar o acesso.  
+> É sobre controlar a natureza da realidade apresentada ao observador."**
 
-![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
-![Coverage](https://img.shields.io/badge/coverage-100%25-success)
-![Author](https://img.shields.io/badge/architect-Álvaro_Alencar-blue)
-
-## 🏛 O Conceito (Segurança Ontológica)
-
-O **ELP-Ω** não é apenas um firewall ou um validador de tokens. É uma implementação algorítmica do conceito de **Segurança Ontológica**, desenvolvida como parte de uma investigação doutoral sobre a integridade e a existência de dados em ambientes hostis.
-
-A maioria dos sistemas de segurança opera no binário: *Acesso Permitido* ou *Acesso Negado*. O ELP-Ω introduz uma terceira via: a **Realidade Simulada**.
-
-Ao utilizar a **Teoria de Zeckendorf** (soma de números de Fibonacci não-consecutivos) para validação de permissões em tempo constante O(1), o protocolo cria um labirinto matemático onde atacantes não são apenas bloqueados — eles são exilados para uma realidade sombra.
-
-## 📐 A Matemática: Restrição de Zeckendorf
-
-Diferente de bitmasks tradicionais, o ELP-Ω impõe uma restrição topológica nas permissões baseada na sequência de Fibonacci:
-
-$$F_n = F_{n-1} + F_{n-2}$$
-
-A regra fundamental do protocolo é que **nenhum bit de permissão adjacente pode estar ativo simultaneamente**.
-`mask & (mask >> 1) == 0`
-
-Isso impede vetores de ataque comuns baseados em "privilege escalation" sequencial e cria uma assinatura digital única para cada requisição.
-
-## 🔮 Arquitetura "Triple-Reality"
-
-O sistema decide qual versão da realidade entregar ao usuário baseando-se na integridade criptográfica da requisição:
-
-1.  **PRIME REALITY:** O dado real, íntegro e descriptografado. Entregue apenas quando a Máscara Zeckendorf, o Timestamp e o HMAC-SHA256 são perfeitamente válidos.
-2.  **MIRROR REALITY:** Uma versão sanitizada (mascarada) dos dados. Entregue quando há uma degradação benigna (ex: latência de rede ou relógio dessincronizado), mantendo a usabilidade sem expor o núcleo.
-3.  **SHADOW REALITY:** O contra-ataque. Se uma violação da regra de Zeckendorf ou um *Replay Attack* é detectado, o sistema gera dados falsos, deterministicamente calculados, que parecem reais estruturalmente, mas são ontologicamente vazios. Isso consome recursos do atacante enquanto protege o sistema.
-
-## ⚡ Implementações Poliglotas
-
-Este repositório contém a prova de conceito e a implementação de referência do protocolo em 5 linguagens, validando sua universalidade:
-
-| Linguagem | Status | Foco da Implementação |
-| :--- | :--- | :--- |
-| **Go** | ✅ Estável | Alta performance e concorrência (Backend Core) |
-| **Rust** | ✅ Estável | Segurança de memória e Zero-Cost Abstraction |
-| **Python** | ✅ Estável | Integração rápida e Prototipagem (Data Science) |
-| **Kotlin** | ✅ Estável | Ecossistema JVM e Android |
-| **TypeScript** | ✅ Estável | Aplicações Web e Edge Computing |
-
-Todas as implementações foram validadas via containerização Docker com 100% de aprovação nos testes unitários de lógica e criptografia.
-
-## 👨‍💻 Sobre o Autor
-
-**Álvaro Alencar**
-*Advogado, Desenvolvedor e Pesquisador.*
-
-Este projeto é fruto de pesquisa independente na intersecção entre Direito Digital, Filosofia da Informação e Engenharia de Software. O objetivo é demonstrar que a segurança jurídica e a segurança computacional podem convergir em protocolos matematicamente robustos.
+![Build Status](https://img.shields.io/badge/build-passing-success?style=for-the-badge&logo=docker)
+![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen?style=for-the-badge)
+![License](https://img.shields.io/badge/license-Proprietary-blue?style=for-the-badge)
+![Author](https://img.shields.io/badge/architect-Álvaro%20Alencar-orange?style=for-the-badge)
 
 ---
-© 2025 Álvaro Alencar. Todos os direitos reservados.
+
+## 📑 Sumário Executivo
+
+O **ELP-Ω (Omega)** é um protocolo de segurança algorítmica **agnóstico de linguagem**, projetado para sistemas de **alta criticidade**.
+
+Diferente de firewalls tradicionais que operam sob a lógica binária *(Allow / Deny)*, o ELP-Ω implementa uma **Arquitetura de Realidade Tripla**, utilizando o **Teorema de Zeckendorf** para validação de integridade em **tempo constante** `O(1)`.
+
+Este projeto representa a convergência prática entre:
+
+- **Ciência da Computação**  
+  *(Criptografia, Teoria dos Números e Arquiteturas Seguras)*  
+- **Direito Digital**  
+  *(Segurança Ontológica, LGPD/GDPR e Integridade da Informação)*
+
+---
+
+## 📐 Fundamentação Matemática  
+### A Restrição de Zeckendorf
+
+A base da segurança do protocolo reside no **Teorema de Zeckendorf**, que afirma:
+
+> Todo número inteiro positivo pode ser representado **de forma única** como a soma de números de Fibonacci **não consecutivos**.
+
+O protocolo explora essa propriedade para criar **máscaras de permissão topologicamente seguras**.
+
+Ao contrário de *bitmasks* tradicionais, onde qualquer bit pode ser ativado, o **ELP-Ω impõe a regra de não-adjacência**, eliminando estados inválidos de permissão.
+
+A recorrência fundamental é:
+
+```math
+F_n = F_{n-1} + F_{n-2}
+
+## Validação da Máscara
+
+A integridade de uma máscara `M` é verificada por uma operação booleana estrita:
+
+```math
+(M & (M >> 1)) == 0
+
+**Resultado verdadeiro (0)**  
+→ Máscara topologicamente válida
+
+**Resultado diferente de 0**  
+→ Tentativa de Privilege Escalation ou Bit-Flipping Attack
+
+Nesse caso, o protocolo não rejeita a requisição.  
+Ele altera a realidade entregue ao observador.
+
+---
+
+## 🔮 Arquitetura de Defesa  
+### Triple-Reality (Ontological Defense)
+
+O sistema não bloqueia conexões suspeitas.  
+Ele as redireciona para camadas distintas de realidade, exaurindo recursos do atacante e preservando o núcleo sensível.
+
+---
+
+## 1️⃣ PRIME REALITY — A Verdade
+
+### Condição
+
+- Máscara Zeckendorf válida  
+- Assinatura HMAC íntegra  
+- Timestamp fresco  
+- Nonce único  
+
+### Resultado
+
+- Dados reais  
+- Conteúdo descriptografado  
+- Operação plena  
+
+### Alvo
+
+- Usuários legítimos  
+- Sistemas autenticados  
+
+---
+
+## 2️⃣ MIRROR REALITY — Degradação Graciosa
+
+### Condição
+
+- Falhas leves de integridade temporal (clock drift)  
+- Erros de formatação não maliciosos  
+
+### Resultado
+
+- Dados sanitizados ou mascarados  
+- Exemplo: `CPF: ***.***.***-00`
+
+### Objetivo
+
+- Manter a usabilidade (UX)  
+- Proteger o núcleo sensível em redes instáveis  
+
+---
+
+## 3️⃣ SHADOW REALITY — O Labirinto Determinístico
+
+### Condição
+
+- Violação da Regra de Zeckendorf  
+- Falha de HMAC  
+- Detecção de Replay Attack  
+
+### Resultado
+
+- Geração de payload sintético em tempo real  
+- Estrutura indistinguível do dado real  
+- Valores derivados de uma Semente de Estabilidade  
+
+### Efeito Tático
+
+- O atacante acredita ter invadido o sistema  
+- Trabalha sobre dados que ontologicamente não existem  
+- Defesa se transforma em ataque passivo (honeypot dinâmico)  
+
+---
+
+## ⚡ Implementação Poliglota  
+### Universalidade do Protocolo
+
+Para provar a independência tecnológica do ELP-Ω, o protocolo foi implementado nativamente nas cinco principais linguagens de backend do mercado.
+
+Não são wrappers.  
+São implementações puras, respeitando os paradigmas de cada ecossistema.
+
+| Linguagem    | Paradigma        | Aplicação Recomendada                                   | Status |
+|-------------|------------------|-----------------------------------------------------------|--------|
+| Go (Golang) | Concorrente      | Microsserviços / Fintech Core                            | ✅ Estável |
+| Rust        | System / Safe    | Sistemas Embarcados / Blockchain Nodes                   | ✅ Estável |
+| Python      | Dinâmico         | Data Science / IA / Prototipagem                          | ✅ Estável |
+| Kotlin      | Híbrido          | Backend JVM / Android Secure Storage                     | ✅ Estável |
+| TypeScript  | Event-Driven     | Serverless (AWS Lambda) / Node.js                        | ✅ Estável |
+
+🔁 Todas as implementações compartilham vetores de teste unificados, garantindo interoperabilidade total entre linguagens.
+
+---
+
+## 🛠️ Engenharia e Testes  
+### CI/CD
+
+O projeto utiliza Docker Compose para orquestração de testes em ambiente isolado.
+
+O pipeline de CI valida:
+
+- Conformidade com a restrição de Zeckendorf  
+- Resistência a Replay Attacks (controle de Nonce)  
+- Geração determinística de Shadow Vaults  
+
+---
+
+## Executar a Suíte Completa de Testes
+
+```bash
+# Requer Docker e Docker Compose
+docker-compose up --build
+
+### Saída esperada
+
+- 5 containers executando testes unitários em paralelo  
+- Todos retornando exit code 0  
+
+---
+
+## ⚖️ Sobre o Autor e a Pesquisa
+
+**Álvaro Alencar**  
+Advogado, Desenvolvedor de Software e Pesquisador Doutorando.
+
+O ELP-Ω nasceu da necessidade de preencher a lacuna entre:
+
+- Segurança Jurídica (LGPD / GDPR)  
+- Segurança Técnica Real  
+
+Enquanto o Direito exige a proteção do dado, a Engenharia frequentemente oferece apenas barreiras estáticas.
+
+Esta pesquisa propõe um paradigma distinto:
+
+**A verdadeira proteção de dados sensíveis deve ser Ontológica.**  
+**O dado não deve existir para o observador não autorizado.**
+
+---
+
+© 2025 Álvaro Alencar  
+Todos os direitos reservados.
+
+Este software é proprietário, desenvolvido como parte de investigação acadêmica e industrial.
