@@ -1,6 +1,6 @@
 # ELP-Ω: The Entangled Logic Protocol
 
-> **"Segurança Ontológica não é sobre negar o acesso. É sobre controlar a natureza da realidade apresentada ao observador."**
+> **"Ontological Security is not about denying access. It's about controlling the nature of reality presented to the observer."**
 
 ![Build Status](https://img.shields.io/badge/build-passing-success?style=for-the-badge&logo=github-actions)
 ![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen?style=for-the-badge)
@@ -9,27 +9,122 @@
 
 ---
 
-## 📑 Sumário Executivo
+## 📋 Executive Summary
 
-O **ELP-Ω (Omega)** é um protocolo de segurança algorítmica agnóstico de linguagem, projetado para sistemas de alta criticidade. Diferente de firewalls tradicionais que operam em lógica binária (Allow/Deny), o ELP-Ω implementa uma **Arquitetura de Realidade Tripla**, utilizando o Teorema de Zeckendorf para validação de integridade em tempo constante $O(1)$.
+**ELP-Ω (Omega)** is a language-agnostic algorithmic security protocol designed for high-criticality systems. Unlike traditional firewalls operating on binary logic (Allow/Deny), ELP-Ω implements a **Triple-Reality Architecture**, utilizing Zeckendorf's Theorem for constant-time $O(1)$ integrity validation.
 
-Este projeto representa a convergência prática entre a **Ciência da Computação** (Criptografia e Teoria dos Números) e o **Direito Digital** (Segurança Ontológica e Integridade da Informação).
+This project represents the practical convergence between **Computer Science** (Cryptography and Number Theory) and **Digital Law** (Ontological Security and Information Integrity).
 
 ---
 
-## 📐 Fundamentação Matemática: A Restrição de Zeckendorf
+## 📐 Mathematical Foundation: The Zeckendorf Constraint
 
-A base da segurança do protocolo reside no **Teorema de Zeckendorf**, que afirma que qualquer número inteiro positivo pode ser representado de forma única como a soma de números de Fibonacci não-consecutivos.
+The protocol's security foundation rests on **Zeckendorf's Theorem**, which states that any positive integer can be uniquely represented as the sum of non-consecutive Fibonacci numbers.
 
-O protocolo utiliza essa propriedade para criar máscaras de permissão topologicamente seguras. Ao contrário de *bitmasks* comuns onde qualquer bit pode ser ativado, o ELP-Ω impõe a regra de **não-adjacência**:
+The protocol uses this property to create topologically secure permission masks. Unlike common bitmasks where any bit can be activated, ELP-Ω enforces the **non-adjacency rule**:
 
 $$F_n = F_{n-1} + F_{n-2}$$
 
-A validação de uma máscara $M$ segue a lógica booleana estrita:
+Mask $M$ validation follows strict boolean logic:
 
 ```math
 (M \ \& \ (M \gg 1)) == 0
+```
 
-Se esta operação resultar em true (0), a máscara é topologicamente válida. Se resultar em qualquer valor diferente, detecta-se uma tentativa de Privilege Escalation ou Bit-Flipping Attack, acionando imediatamente as contramedidas da Shadow Reality.🔮 Arquitetura de "Triple-Reality" (Ontological Defense)O sistema não rejeita conexões suspeitas; ele as gerencia através de camadas de realidade. Isso exaure os recursos do atacante, mantendo-o preso em um ambiente simulado.1. PRIME REALITY (A Verdade)Condição: Máscara Zeckendorf Válida + Assinatura HMAC Íntegra + Timestamp Fresco + Nonce Único.Resultado: O sistema entrega o dado real, descriptografado e operacional.Alvo: Usuários legítimos e sistemas autenticados.2. MIRROR REALITY (A Degradação Graciosa)Condição: Falha leve de integridade temporal (clock drift) ou erros de formatação não-maliciosos.Resultado: O sistema entrega dados sanitizados/mascarados (ex: CPF: ***.***.***-00).Objetivo: Manter a usabilidade (UX) em redes instáveis sem expor o núcleo sensível.3. SHADOW REALITY (O Labirinto Determinístico)Condição: Violação da Regra de Zeckendorf, Falha de HMAC ou Detecção de Replay Attack.Resultado: O sistema gera, em tempo real, um payload sintético indistinguível do real em estrutura, mas com valores matematicamente gerados a partir de uma "Semente de Estabilidade".Efeito Tático: O atacante acredita ter invadido o sistema. Ele continua tentando decifrar dados que, ontologicamente, não existem. Isso transforma a defesa em ataque passivo (honeypot dinâmico).⚡ Implementação Poliglota (Cross-Platform)Para provar a universalidade do teorema, o protocolo foi implementado nativamente e validado nas 5 principais linguagens de backend do mercado atual. Não são wrappers; são implementações puras seguindo os paradigmas de cada ecossistema.LinguagemParadigmaAplicação RecomendadaStatusGo (Golang)ConcorrenteMicrosserviços de Alta Performance / Fintech Core✅ EstávelRustSystem/SafeSistemas Embarcados / Blockchain Nodes✅ EstávelPythonDinâmicoData Science / AI Pipelines / Prototipagem✅ EstávelKotlinHíbridoBackend JVM / Android Secure Storage✅ EstávelTypeScriptEvent-DrivenServerless Functions (AWS Lambda) / Node.js✅ EstávelTodas as implementações compartilham vetores de teste unificados, garantindo que um token gerado em Python seja perfeitamente validado em Rust.🛠️ Engenharia e Testes (CI/CD)O projeto utiliza Docker Compose para orquestração de testes em ambiente isolado. O pipeline de CI valida:Conformidade com a restrição de Zeckendorf.Resistência a Replay Attacks (gerenciamento de Nonce).Geração determinística de Shadow Vaults.Como Executar a Suíte de Testes (Total)Bash# Requer Docker e Docker Compose instalados
+If this operation results in true (0), the mask is topologically valid. Any other value indicates a Privilege Escalation or Bit-Flipping Attack attempt, immediately triggering Shadow Reality countermeasures.
+
+---
+
+## 🔮 Triple-Reality Architecture (Ontological Defense)
+
+The system doesn't reject suspicious connections; it manages them through reality layers, exhausting attacker resources by trapping them in simulated environments.
+
+### 1. PRIME REALITY (The Truth)
+
+**Condition:** Valid Zeckendorf Mask + Intact HMAC Signature + Fresh Timestamp + Unique Nonce
+
+**Result:** The system delivers real, decrypted, operational data
+
+**Target:** Legitimate users and authenticated systems
+
+### 2. MIRROR REALITY (Graceful Degradation)
+
+**Condition:** Minor temporal integrity failure (clock drift) or non-malicious formatting errors
+
+**Result:** The system delivers sanitized/masked data (e.g., SSN: ***-**-1234)
+
+**Purpose:** Maintain usability (UX) on unstable networks without exposing sensitive core
+
+### 3. SHADOW REALITY (The Deterministic Labyrinth)
+
+**Condition:** Zeckendorf Rule violation, HMAC failure, or Replay Attack detection
+
+**Result:** The system generates, in real-time, a synthetic payload structurally indistinguishable from real data, but with mathematically generated values derived from a "Stability Seed"
+
+**Tactical Effect:** The attacker believes they've breached the system and continues attempting to decipher data that, ontologically, doesn't exist. This transforms defense into passive offense (dynamic honeypot).
+
+---
+
+## ⚡ Polyglot Implementation (Cross-Platform)
+
+To prove the theorem's universality, the protocol was natively implemented and validated in the 5 major backend languages of today's market. These are not wrappers; they are pure implementations following each ecosystem's paradigms.
+
+| Language | Paradigm | Recommended Application | Status |
+|----------|----------|------------------------|--------|
+| **Go** | Concurrent | High-Performance Microservices / Fintech Core | ✅ Stable |
+| **Rust** | System/Safe | Embedded Systems / Blockchain Nodes | ✅ Stable |
+| **Python** | Dynamic | Data Science / AI Pipelines / Prototyping | ✅ Stable |
+| **Kotlin** | Hybrid | JVM Backend / Android Secure Storage | ✅ Stable |
+| **TypeScript** | Event-Driven | Serverless Functions (AWS Lambda) / Node.js | ✅ Stable |
+
+All implementations share unified test vectors, ensuring that a token generated in Python is perfectly validated in Rust.
+
+---
+
+## 🛠️ Engineering and Testing (CI/CD)
+
+The project uses Docker Compose for orchestration of tests in isolated environments. The CI pipeline validates:
+
+- Conformance with Zeckendorf constraint
+- Resistance to Replay Attacks (Nonce management)
+- Deterministic Shadow Vault generation
+
+### Running the Complete Test Suite
+
+```bash
+# Requires Docker and Docker Compose installed
 docker-compose up --build
-Saída esperada: 5 containers executando testes unitários paralelos e retornando exit code 0.⚖️ Sobre o Autor e a PesquisaÁlvaro AlencarAdvogado, Desenvolvedor de Software e Pesquisador Doutorando.O ELP-Ω nasceu da necessidade de preencher a lacuna entre a Segurança Jurídica (exigida pela LGPD/GDPR) e a Segurança Técnica. Enquanto o Direito exige a proteção do dado, a Engenharia muitas vezes falha ao oferecer apenas barreiras estáticas.Esta pesquisa propõe que a verdadeira proteção de dados sensíveis deve ser Ontológica: o dado não deve "existir" para o observador não-autorizado.© 2025 Álvaro Alencar. Todos os direitos reservados.Este software é proprietário e desenvolvido como parte de investigação acadêmica e industrial.
+```
+
+**Expected output:** 5 containers running parallel unit tests and returning exit code 0.
+
+---
+
+## ⚖️ About the Author and Research
+
+**Álvaro Alencar**  
+*Lawyer, Software Developer, and Doctoral Researcher*
+
+ELP-Ω was born from the need to bridge the gap between **Legal Security** (required by LGPD/GDPR) and **Technical Security**. While Law demands data protection, Engineering often fails by offering only static barriers.
+
+This research proposes that true protection of sensitive data must be **Ontological**: the data should not "exist" for unauthorized observers.
+
+---
+
+## 📄 License
+
+© 2025 Álvaro Alencar. All rights reserved.
+
+This software is proprietary and developed as part of academic and industrial research.
+
+---
+
+## 🔗 Links
+
+- **Documentation:** [Coming Soon]
+- **Research Paper:** [Coming Soon]
+- **Contact:** [Your Contact Information]
+
+---
+
+**Built with mathematical rigor. Deployed with strategic intent.**
