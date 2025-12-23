@@ -1,9 +1,14 @@
 name: ELP-Omega CI
 on: [push, pull_request]
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Run Tests
-        run: make test-all
+      
+      - name: Build and Run Tests (Docker)
+        # O comando mágico que roda igual na sua máquina
+        # --abort-on-container-exit: Para tudo se alguém falhar
+        # --exit-code-from: Usa o código de saída do container para dizer se passou ou falhou
+        run: docker-compose up --build --abort-on-container-exit

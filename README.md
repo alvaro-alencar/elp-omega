@@ -70,7 +70,7 @@ The system doesn't reject suspicious connections; it manages them through realit
 To prove the theorem's universality, the protocol was natively implemented and validated in the 5 major backend languages of today's market. These are not wrappers; they are pure implementations following each ecosystem's paradigms.
 
 | Language | Paradigm | Recommended Application | Status |
-|----------|----------|------------------------|--------|
+| :--- | :--- | :--- | :--- |
 | **Go** | Concurrent | High-Performance Microservices / Fintech Core | ✅ Stable |
 | **Rust** | System/Safe | Embedded Systems / Blockchain Nodes | ✅ Stable |
 | **Python** | Dynamic | Data Science / AI Pipelines / Prototyping | ✅ Stable |
@@ -124,7 +124,7 @@ This software is proprietary and developed as part of academic and industrial re
 - **Documentation:** [Technical Architecture & Operations](docs/architecture.md)
 - **Research Paper:** [Ontological Security: A Philosophical Approach to Cyberdefense](docs/ontological-security.md)
 - **Mathematics:** [The Zeckendorf Constraint Proof](docs/fibonacci-constraint.md)
-- **Contact:** ac.alvaro@gmail.com
+- **Contact:** <ac.alvaro@gmail.com>
 
 ---
 

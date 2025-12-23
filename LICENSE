@@ -1,21 +1,26 @@
-MIT License
+# ELP-OMEGA LICENSE AGREEMENT (DUAL LICENSE MODEL)
 
-Copyright (c) 2024 Álvaro Alencar / Vortex Development
+Copyright (c) 2024-2025 Álvaro Alencar / Vortex Development. All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This software is protected by copyright law and international treaties. The licensing provided below is based on the nature of the usage:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. ACADEMIC AND NON-COMMERCIAL USE (COMMUNITY LICENSE)
+   Permission is hereby granted, free of charge, to any person obtaining a copy of this software (the "Software"), to use, copy, and modify the Software solely for:
+   (a) Academic research;
+   (b) Educational purposes;
+   (c) Personal, non-commercial experimentation.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+   Conditions:
+   - Modifications must remain open and share this same license.
+   - You may NOT use this Software in a production environment of a commercial entity.
+   - You may NOT sell, sub-license, or monetize services based on this Software without a Commercial License.
+
+2. COMMERCIAL AND PRODUCTION USE (ENTERPRISE LICENSE)
+   Any use of the Software in a commercial environment, production system, or for-profit service requires a valid Commercial License agreement with Vortex Development.
+
+   Please contact: [ac.alvaro@gmail.com](mailto:ac.alvaro@gmail.com) for commercial licensing inquiries.
+
+3. DISCLAIMER
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY.
+
+By using this software, you agree to these terms.
