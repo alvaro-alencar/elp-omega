@@ -1,0 +1,41 @@
+# General
+*.log
+*.swp
+*.swo
+*~
+.DS_Store
+.env
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+
+# Kotlin/Gradle
+.gradle/
+build/
+out/
+*.iml
+.idea/
+*.class
+*.jar
+*.war
+
+# IDE
+.vscode/
+*.code-workspace
+
+# Test coverage
+coverage.txt
+*.coverprofile
+
+# Secrets (NEVER commit)
+secrets/
+*.pem
+*.key
+config.local.*
