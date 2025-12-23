@@ -88,11 +88,19 @@ O sistema gere o acesso através de **camadas de realidade**. O objetivo não é
 
 A segurança do protocolo repousa sobre o **Teorema de Zeckendorf**, que afirma que qualquer número inteiro positivo pode ser representado de forma única como a soma de números de Fibonacci não-consecutivos.
 
-$$
-F_n = F_{n-1} + F_{n-2} \implies (M \ \& \ (M \gg 1)) == 0
-$$
+---
 
-Essa propriedade permite validação bitwise em $O(1)$, garantindo que permissões conflitantes (bits adjacentes) sejam matematicamente impossíveis.
+**Fórmula de Recorrência de Fibonacci:**  
+`Fₙ = Fₙ₋₁ + Fₙ₋₂`
+
+**Restrição de Adjacência Zeckendorf (validação bitwise):**  
+`(M & (M >> 1)) = 0`
+
+Onde `M` é a máscara de permissões binária, `&` é AND bitwise, e `>> 1` é deslocamento à direita de 1 bit.
+
+---
+
+Essa propriedade permite validação bitwise em **O(1)**, garantindo que permissões conflitantes (bits adjacentes) sejam matematicamente impossíveis.
 
 ---
 
